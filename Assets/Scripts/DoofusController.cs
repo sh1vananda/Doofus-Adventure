@@ -2,11 +2,17 @@ using UnityEngine;
 
 public class DoofusController : MonoBehaviour
 {
-    public float speed = 5.0f; // Speed of the character, can be set from JSON
+    public float speed = 5.0f; // Speed of Doofus's movement
+    private ScoreManager scoreManager; // Reference to the ScoreManager
+
+    void Start()
+    {
+        scoreManager = FindObjectOfType<ScoreManager>(); // Find the ScoreManager in the scene
+    }
 
     void Update()
     {
-        // Get input from arrow keys or WASD
+        // Handle movement input
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
 
@@ -15,5 +21,15 @@ public class DoofusController : MonoBehaviour
 
         // Move the character
         transform.Translate(movement * speed * Time.deltaTime, Space.World);
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        // Check if Doofus has entered a Pulpit
+        if (other.CompareTag("Pulpit"))
+        {
+            scoreManager.IncrementScore(); // Increment the score
+            // Optional: Additional logic for when Doofus moves onto a new Pulpit
+        }
     }
 }
