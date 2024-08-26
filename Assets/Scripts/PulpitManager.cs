@@ -1,61 +1,54 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class PulpitManager : MonoBehaviour
 {
     public GameObject pulpitPrefab; // Assign your Pulpit prefab in the Inspector
-    public int maxPulpits = 2;
-    private List<GameObject> pulpits = new List<GameObject>();
-    private Vector3 lastRemovedPulpitPosition = Vector3.positiveInfinity; // Initialize with a non-reachable position
+    public float spawnInterval = 3.0f; // Time interval between spawns
+    public float scaleDuration = 0.3f; // Duration of the scaling animation
+    private List<GameObject> pulpits = new List<GameObject>(); // List to hold active Pulpits
 
     void Start()
     {
-        // Create the initial Pulpit at the starting position
-        Vector3 initialPosition = Vector3.zero;
-        SpawnInitialPulpit(initialPosition);
+        // Spawn the initial Pulpit at the starting position
+        SpawnPulpit(Vector3.zero);
 
-        // Start spawning new Pulpits after a delay of 2 seconds, then every 3 seconds
-        InvokeRepeating("SpawnNewPulpit", 2f, 3f);
+        // Start the coroutine to spawn new Pulpits
+        InvokeRepeating(nameof(SpawnNewPulpit), spawnInterval, spawnInterval);
     }
 
-    private void SpawnInitialPulpit(Vector3 position)
+    private void SpawnNewPulpit()
     {
-        GameObject initialPulpit = Instantiate(pulpitPrefab, position, Quaternion.identity);
-        pulpits.Add(initialPulpit);
-    }
+        // Determine the position for the new Pulpit
+        Vector3 newPosition = GenerateNewPosition();
 
-    public void SpawnNewPulpit()
-    {
-        // Check if the maximum number of Pulpits is reached
-        if (pulpits.Count >= maxPulpits)
-        {
-            DestroyOldestPulpit(); // Destroy the oldest Pulpit
-        }
-
-        Vector3 newPosition;
-        if (pulpits.Count > 0)
-        {
-            do
-            {
-                newPosition = GenerateAdjacentPosition(pulpits[pulpits.Count - 1].transform.position);
-            } while (newPosition == lastRemovedPulpitPosition); // Ensure new Pulpit doesn't spawn at the last removed position
-        }
-        else
-        {
-            newPosition = Vector3.zero; // Default position if no pulpits exist
-        }
-
+        // Spawn the new Pulpit with an initial small scale
         GameObject newPulpit = Instantiate(pulpitPrefab, newPosition, Quaternion.identity);
+        newPulpit.transform.localScale = Vector3.zero; // Start at zero scale
         pulpits.Add(newPulpit);
 
-        // Optionally destroy the new Pulpit after a certain time
-        Destroy(newPulpit, 5.0f); // Adjust the time as needed
+        // Start the scaling animation to grow the pulpit to a 9x1x9 slab
+        StartCoroutine(ScalePulpit(newPulpit, Vector3.zero, new Vector3(9, 1, 9), scaleDuration));
+
+        // Destroy the oldest Pulpit 1 second after the new one spawns if there are more than 1 pulpit
+        if (pulpits.Count > 1)
+        {
+            Destroy(pulpits[0], 1.5f);
+            pulpits.RemoveAt(0);
+        }
     }
 
-    private Vector3 GenerateAdjacentPosition(Vector3 previousPosition)
+    private void SpawnPulpit(Vector3 position)
     {
-        float offset = 9.0f; // Assuming Pulpit size is 9
-        List<Vector3> directions = new List<Vector3>
+        GameObject newPulpit = Instantiate(pulpitPrefab, position, Quaternion.identity);
+        pulpits.Add(newPulpit);
+    }
+
+    private Vector3 GenerateNewPosition()
+    {
+        float offset = 9.0f; // Size of the pulpit slab (9x9)
+        Vector3[] directions = new Vector3[]
         {
             new Vector3(offset, 0, 0),  // Right
             new Vector3(-offset, 0, 0), // Left
@@ -63,29 +56,23 @@ public class PulpitManager : MonoBehaviour
             new Vector3(0, 0, -offset)  // Backward
         };
 
-        // Generate potential new positions
-        List<Vector3> potentialPositions = new List<Vector3>();
-        foreach (var direction in directions)
-        {
-            Vector3 potentialPosition = previousPosition + direction;
-            if (potentialPosition != lastRemovedPulpitPosition)
-            {
-                potentialPositions.Add(potentialPosition);
-            }
-        }
+        // Choose a random direction for the new Pulpit
+        Vector3 lastPulpitPosition = pulpits[pulpits.Count - 1].transform.position;
+        Vector3 direction = directions[Random.Range(0, directions.Length)];
+        Vector3 newPosition = lastPulpitPosition + direction;
 
-        // Choose a random available position
-        return potentialPositions[Random.Range(0, potentialPositions.Count)];
+        return newPosition;
     }
 
-    private void DestroyOldestPulpit()
+    private IEnumerator ScalePulpit(GameObject pulpit, Vector3 fromScale, Vector3 toScale, float duration)
     {
-        if (pulpits.Count > 0)
+        float elapsed = 0f;
+        while (elapsed < duration)
         {
-            GameObject pulpitToDestroy = pulpits[0];
-            lastRemovedPulpitPosition = pulpitToDestroy.transform.position; // Update last removed position before destroying
-            pulpits.RemoveAt(0);
-            Destroy(pulpitToDestroy);
+            pulpit.transform.localScale = Vector3.Lerp(fromScale, toScale, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
         }
+        pulpit.transform.localScale = toScale; // Ensure it reaches the final size
     }
 }
