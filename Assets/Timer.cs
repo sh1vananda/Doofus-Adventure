@@ -9,12 +9,12 @@ public class PulpitTimer : MonoBehaviour
 
     void Start()
     {
-        currentTime = countdownTime;
         timerText = GetComponentInChildren<TMP_Text>(); // Find the TimerText component
         if (timerText == null)
         {
             Debug.LogError("TimerText component not found on Pulpit.");
         }
+        ResetTimer(); // Initialize the timer
     }
 
     void Update()
@@ -22,6 +22,12 @@ public class PulpitTimer : MonoBehaviour
         if (currentTime > 0)
         {
             currentTime -= Time.deltaTime;
+            UpdateTimerText();
+        }
+        else
+        {
+            // Ensure the timer text shows zero when time is up
+            currentTime = 0;
             UpdateTimerText();
         }
     }
@@ -39,6 +45,11 @@ public class PulpitTimer : MonoBehaviour
     public void SetCountdownTime(float time)
     {
         countdownTime = time;
+        ResetTimer(); // Reset the timer with the new countdown time
+    }
+
+    private void ResetTimer()
+    {
         currentTime = countdownTime; // Initialize current time with the countdown time
     }
 }

@@ -1353,8 +1353,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pulpitPrefab: {fileID: 1125319013082703311, guid: 4ee375bc8e768e34b9853eba9014bc69, type: 3}
-  spawnInterval: 3
-  scaleDuration: 0.3
+  minPulpitDestroyTime: 4
+  maxPulpitDestroyTime: 5
+  pulpitSpawnTime: 2.5
+  initialPulpitTime: 3
 --- !u!1 &1852753981
 GameObject:
   m_ObjectHideFlags: 0
