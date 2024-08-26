@@ -80,4 +80,5 @@ public class PulpitManager : MonoBehaviour
         }
         pulpit.transform.localScale = toScale; // Ensure it reaches the final size
     }
+
 }
