@@ -1,9 +1,9 @@
 using UnityEngine;
-using TMPro; // Import the TextMeshPro namespace
+using TMPro; // Assuming you're using TextMeshPro for UI text
 
 public class ScoreManager : MonoBehaviour
 {
-    public TMP_Text scoreText; // Use TMP_Text for TextMeshPro
+    public TMP_Text scoreText; // Reference to the UI Text element
     private int score = 0; // Initial score
 
     void Start()
@@ -19,6 +19,6 @@ public class ScoreManager : MonoBehaviour
 
     private void UpdateScoreText()
     {
-        scoreText.text = $"Score: {score}"; // Update the text element
+        scoreText.text = "Score: " + score.ToString(); // Update the text element
     }
 }
