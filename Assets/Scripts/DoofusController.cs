@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class DoofusController : MonoBehaviour
 {
-    public float speed = 5.0f; // Speed of Doofus's movement
+    public float speed = 20.0f; // Speed of Doofus's movement
     private ScoreManager scoreManager; // Reference to the ScoreManager
 
     void Start()

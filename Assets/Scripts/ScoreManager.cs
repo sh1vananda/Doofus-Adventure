@@ -8,6 +8,12 @@ public class ScoreManager : MonoBehaviour
 
     void Start()
     {
+        // Ensure scoreText is assigned
+        if (scoreText == null)
+        {
+            Debug.LogError("ScoreText is not assigned in the Inspector!");
+            return;
+        }
         UpdateScoreText(); // Initialize the score display
     }
 
@@ -19,6 +25,13 @@ public class ScoreManager : MonoBehaviour
 
     private void UpdateScoreText()
     {
-        scoreText.text = "Score: " + score.ToString(); // Update the text element
+        if (scoreText != null)
+        {
+            scoreText.text = "Score: " + score.ToString(); // Update the text element
+        }
+        else
+        {
+            Debug.LogWarning("ScoreText reference is None, cannot update.");
+        }
     }
 }

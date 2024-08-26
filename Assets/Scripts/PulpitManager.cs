@@ -31,11 +31,18 @@ public class PulpitManager : MonoBehaviour
         // Start the scaling animation to grow the pulpit to a 9x1x9 slab
         StartCoroutine(ScalePulpit(newPulpit, Vector3.zero, new Vector3(9, 1, 9), scaleDuration));
 
-        // Destroy the oldest Pulpit 1 second after the new one spawns if there are more than 1 pulpit
+        // Destroy the oldest Pulpit 1.5 seconds after the new one spawns if there are more than 1 pulpit
         if (pulpits.Count > 1)
         {
             Destroy(pulpits[0], 1.5f);
             pulpits.RemoveAt(0);
+        }
+
+        // Set the countdown time on the PulpitTimer if it exists
+        PulpitTimer timer = newPulpit.GetComponent<PulpitTimer>();
+        if (timer != null)
+        {
+            timer.SetCountdownTime(spawnInterval + 1.5f); // Set the timer to match the destruction time
         }
     }
 
@@ -57,11 +64,9 @@ public class PulpitManager : MonoBehaviour
         };
 
         // Choose a random direction for the new Pulpit
-        Vector3 lastPulpitPosition = pulpits[pulpits.Count - 1].transform.position;
+        Vector3 lastPulpitPosition = pulpits.Count > 0 ? pulpits[pulpits.Count - 1].transform.position : Vector3.zero;
         Vector3 direction = directions[Random.Range(0, directions.Length)];
-        Vector3 newPosition = lastPulpitPosition + direction;
-
-        return newPosition;
+        return lastPulpitPosition + direction;
     }
 
     private IEnumerator ScalePulpit(GameObject pulpit, Vector3 fromScale, Vector3 toScale, float duration)
